@@ -1,4 +1,4 @@
-# AWS Infrastructure Creation 
+# AWS Infrastructure
 
 ## Step 0: Initialize Terraform
 ```
