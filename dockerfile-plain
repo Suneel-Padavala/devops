@@ -1,0 +1,19 @@
+# Use a Python base image
+FROM python:3.11.5
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the application code and requirements file into the container
+COPY Hello.py .
+COPY templates templates/
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install -r requirements.txt
+
+# Expose the port your Flask app will run on
+EXPOSE 5000
+
+# Define the command to run your Flask app
+CMD ["python", "HelloWorld-Plain.py"]

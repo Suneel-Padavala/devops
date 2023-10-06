@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: helloworld
+  template:
+    metadata:
+      labels:
+        app: helloworld
+    spec:
+      containers:
+      - name: helloworld
+        image: 145988340565.dkr.ecr.us-west-2.amazonaws.com/asg
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+# service type loadbalancer       
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: helloworld
+    k8s-app: helloworld
+  name: flask-svc
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 5000
+  type: LoadBalancer
+  selector:
+    app: helloworld
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    spec.ingressClassName: alb
+    external-dns.alpha.kubernetes.io/hostname: flask.example.com
+    alb.ingress.kubernetes.io/target-type: 'ip'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
+    alb.ingress.kubernetes.io/cors-enabled: "true"
+    alb.ingress.kubernetes.io/cors-allow-origin: "*"
+    alb.ingress.kubernetes.io/cors-allow-headers: "*"
+    alb.ingress.kubernetes.io/cors-allow-methods: "*"
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    #alb.ingress.kubernetes.io/tags: Environment=${var.environment}, Application=${var.application}, Team=${var.team}}
+  name: flask-ingress
+  #namespace: testns
+spec:
+  rules:
+    - host: flask
+      http:
+        paths:
+          - backend:
+              service:
+                name: ssl-redirect
+                port:
+                  name: use-annotation
+            path: /
+            pathType: Prefix
+          - backend:
+              service:
+                name: flask-svc
+                port:
+                  number: 5000
+            path: /
+            pathType: Prefix
+
+            
