@@ -26,17 +26,11 @@ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 #To get context information of kubernetes cluster
 cat /home/ec2-user/.kube/config 
 
-#To create namespace in kubernetes cluster
-kubectl create namespace test
-
 #To get deployments in a namespace in kubernetes cluster
-kubectl get deployments --namespace=test 
+kubectl get deployments
 
 #To get services in a namespace in kubernetes cluster
-kubectl get svc --namespace=test 
-
-#To delete everything in a namespace in kubernetes cluster
-kubectl delete all --all -n test 
+kubectl get svc
 
 #To delete unused docker images to cleanup memeory on system 
 docker system prune  
